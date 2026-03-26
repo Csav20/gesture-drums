@@ -115,6 +115,13 @@ El panel de configuración (⚙️) permite ajustar:
 - **Velocidad máxima de mapeo** — Rango de respuesta dinámica (0.02–0.10)
 - **Suavizado de manos** — Factor de filtro EMA (0.2–1.0)
 
-## 📄 Licencia
+## � Autores
+
+Proyecto colaborado y desarrollado por:
+
+- **Claudio** ([@Csav20](https://github.com/Csav20)) — Diseño, concepto y desarrollo
+- **Claude AI** (Anthropic) — Asistencia en desarrollo y programación
+
+## �📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
