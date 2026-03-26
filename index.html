@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Drums — Batería con gestos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Startup overlay -->
+    <div id="startup-overlay">
+        <div class="startup-content">
+            <h1>🥁 Gesture Drums</h1>
+            <p class="subtitle">Batería controlada con gestos — tus dedos son las baquetas</p>
+            <div class="instructions">
+                <div class="inst-item">
+                    <span class="inst-icon">☝️</span>
+                    <span>Tus dedos índice son las baquetas</span>
+                </div>
+                <div class="inst-item">
+                    <span class="inst-icon">👇</span>
+                    <span>Golpea hacia abajo para tocar</span>
+                </div>
+                <div class="inst-item">
+                    <span class="inst-icon">🎵</span>
+                    <span>Hi-Hat, Snare, Toms, Crash, Ride, Kick</span>
+                </div>
+                <div class="inst-item">
+                    <span class="inst-icon">✊</span>
+                    <span>Puño cerrado sobre Hi-Hat → Hi-Hat cerrado</span>
+                </div>
+            </div>
+            <button id="start-btn">Iniciar Cámara</button>
+            <p class="note">Se requiere acceso a la cámara web</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="hidden">
+        <!-- Drum kit canvas (full screen background) -->
+        <canvas id="drum-canvas"></canvas>
+
+        <!-- Camera feed overlay -->
+        <div id="camera-overlay">
+            <video id="webcam" playsinline></video>
+            <canvas id="hand-canvas"></canvas>
+        </div>
+
+        <!-- Drumstick cursors -->
+        <div id="stick-left" class="drumstick hidden">
+            <div class="stick-tip"></div>
+            <div class="stick-trail"></div>
+        </div>
+        <div id="stick-right" class="drumstick hidden">
+            <div class="stick-tip"></div>
+            <div class="stick-trail"></div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div id="hud-left">
+                <span id="fps-counter">FPS: --</span>
+                <span id="latency">Lat: --</span>
+            </div>
+            <div id="hud-center">
+                <span id="last-hit">🥁</span>
+            </div>
+            <div id="hud-right">
+                <button id="btn-toggle-camera" class="hud-btn" title="Toggle cámara">📷</button>
+                <button id="btn-toggle-kit" class="hud-btn" title="Cambiar kit">🎨</button>
+                <button id="btn-metronome" class="hud-btn" title="Metrónomo">⏱️</button>
+                <button id="btn-settings" class="hud-btn" title="Sensibilidad">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Hit velocity indicator -->
+        <div id="velocity-bar-left" class="velocity-bar"></div>
+        <div id="velocity-bar-right" class="velocity-bar right"></div>
+
+        <!-- Sensitivity Settings Panel -->
+        <div id="sensitivity-panel" class="hidden">
+            <div class="panel-header">
+                <span>⚙️ Sensibilidad</span>
+                <button id="btn-close-panel" class="panel-close">&times;</button>
+            </div>
+            <div class="panel-body">
+                <label>Umbral de golpe
+                    <input type="range" id="sens-threshold" min="0.003" max="0.025" step="0.001" value="0.008">
+                    <span id="val-threshold">0.008</span>
+                </label>
+                <label>Cooldown (ms)
+                    <input type="range" id="sens-cooldown" min="30" max="200" step="5" value="60">
+                    <span id="val-cooldown">60</span>
+                </label>
+                <label>Vel. máx. mapa
+                    <input type="range" id="sens-velmax" min="0.02" max="0.10" step="0.005" value="0.045">
+                    <span id="val-velmax">0.045</span>
+                </label>
+                <label>Vel. mínima salida
+                    <input type="range" id="sens-floor" min="0.1" max="0.5" step="0.05" value="0.25">
+                    <span id="val-floor">0.25</span>
+                </label>
+                <label>Suavizado manos
+                    <input type="range" id="sens-smooth" min="0.2" max="1.0" step="0.05" value="0.45">
+                    <span id="val-smooth">0.45</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaPipe CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <!-- App Scripts -->
+    <script src="js/audioEngine.js"></script>
+    <script src="js/drumKit.js"></script>
+    <script src="js/handTracker.js"></script>
+    <script src="js/hitDetector.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

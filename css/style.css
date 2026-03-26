@@ -1,0 +1,425 @@
+/* ============================================
+   Gesture Drums — CSS
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #0a0a0a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #fff;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ---- Startup Overlay ---- */
+
+#startup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s;
+}
+
+#startup-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.startup-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 40px;
+}
+
+.startup-content h1 {
+    font-size: 2.8rem;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #f77062, #fe5196);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #8892b0;
+    margin-bottom: 30px;
+}
+
+.instructions {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.inst-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #ccd6f6;
+}
+
+.inst-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+#start-btn {
+    padding: 16px 48px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f77062, #fe5196);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(247, 112, 98, 0.4);
+}
+
+#start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.note {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+/* ---- App ---- */
+
+#app {
+    position: fixed;
+    inset: 0;
+}
+
+#app.hidden {
+    display: none;
+}
+
+/* ---- Drum Canvas ---- */
+
+#drum-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* ---- Camera Overlay ---- */
+
+#camera-overlay {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    width: 200px;
+    height: 150px;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 20;
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+#webcam {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+}
+
+#hand-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+}
+
+/* ---- Drumstick Cursors ---- */
+
+.drumstick {
+    position: fixed;
+    z-index: 10;
+    pointer-events: none;
+    transition: none;
+}
+
+.drumstick.hidden {
+    display: none;
+}
+
+.stick-tip {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 30%, rgba(247, 112, 98, 0.8) 100%);
+    box-shadow: 0 0 12px rgba(247, 112, 98, 0.6), 0 0 24px rgba(247, 112, 98, 0.3);
+    transform: translate(-50%, -50%);
+}
+
+.drumstick.hitting .stick-tip {
+    width: 32px;
+    height: 32px;
+    background: radial-gradient(circle, #fff 20%, #f77062 60%, #fe5196 100%);
+    box-shadow: 0 0 20px rgba(247, 112, 98, 0.9), 0 0 40px rgba(254, 81, 150, 0.5);
+}
+
+#stick-right .stick-tip {
+    background: radial-gradient(circle, #fff 30%, rgba(52, 152, 219, 0.8) 100%);
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.6), 0 0 24px rgba(52, 152, 219, 0.3);
+}
+
+#stick-right.hitting .stick-tip {
+    background: radial-gradient(circle, #fff 20%, #3498db 60%, #2980b9 100%);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.9), 0 0 40px rgba(41, 128, 185, 0.5);
+}
+
+.stick-trail {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: 0;
+    background: linear-gradient(to top, transparent, rgba(247, 112, 98, 0.4));
+    transform: translateX(-50%);
+    transform-origin: top center;
+    pointer-events: none;
+}
+
+#stick-right .stick-trail {
+    background: linear-gradient(to top, transparent, rgba(52, 152, 219, 0.4));
+}
+
+/* ---- HUD ---- */
+
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 15;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+    pointer-events: none;
+}
+
+#hud > * {
+    pointer-events: auto;
+}
+
+#hud-left {
+    display: flex;
+    gap: 16px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    font-family: 'SF Mono', monospace;
+}
+
+#hud-center {
+    font-size: 1.6rem;
+    opacity: 0.8;
+    transition: transform 0.1s;
+}
+
+#hud-center.pulse {
+    transform: scale(1.3);
+}
+
+#hud-right {
+    display: flex;
+    gap: 8px;
+}
+
+.hud-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.hud-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.hud-btn.active {
+    background: rgba(247, 112, 98, 0.3);
+}
+
+/* ---- Velocity Bars ---- */
+
+.velocity-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    height: 0;
+    background: linear-gradient(to top, #f77062, #fe5196);
+    border-radius: 3px 3px 0 0;
+    z-index: 12;
+    transition: height 0.05s ease-out;
+    opacity: 0.7;
+}
+
+.velocity-bar.right {
+    left: auto;
+    right: 0;
+    background: linear-gradient(to top, #3498db, #2980b9);
+}
+
+/* ---- Sensitivity Panel ---- */
+
+#sensitivity-panel {
+    position: absolute;
+    top: 60px;
+    right: 16px;
+    width: 280px;
+    background: rgba(15, 15, 30, 0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    z-index: 25;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#sensitivity-panel.hidden {
+    display: none;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ccd6f6;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    color: #8892b0;
+    font-size: 1.4rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.panel-close:hover {
+    color: #f77062;
+}
+
+.panel-body {
+    padding: 12px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.panel-body label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #8892b0;
+}
+
+.panel-body input[type="range"] {
+    flex: 1;
+    min-width: 100px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+}
+
+.panel-body input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #f77062;
+    cursor: pointer;
+}
+
+.panel-body span {
+    min-width: 40px;
+    text-align: right;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.7rem;
+    color: #64ffda;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    #camera-overlay {
+        width: 140px;
+        height: 105px;
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .startup-content h1 {
+        font-size: 2rem;
+    }
+
+    .stick-tip {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    #camera-overlay {
+        width: 110px;
+        height: 82px;
+    }
+
+    .startup-content {
+        padding: 20px;
+    }
+
+    #start-btn {
+        padding: 12px 32px;
+        font-size: 1rem;
+    }
+}
