@@ -13,6 +13,11 @@ Batería virtual controlada por gestos de las manos mediante seguimiento en tiem
 - **Seguimiento de manos en tiempo real** — Detección de gestos mediante MediaPipe Hands con hasta 2 manos simultáneas
 - **Síntesis de audio completa** — Todos los sonidos generados en tiempo real con Web Audio API (sin samples externos)
 - **13 zonas de batería** — Hi-Hat (abierto/cerrado), Snare, Toms (High, Mid, Floor), Crash (x2), Ride, Ride Bell, Rim Shots (x2), Kick
+- **🎶 Sistema de aprendizaje** — Patrones guíados con señales visuales de color por nivel:
+  - 🟢 **Básico** — Hi-Hat, Kick+Snare, Rock Simple
+  - 🟡 **Medio** — Rock 8th Notes, Funk, Disco
+  - 🔴 **Avanzado** — Paradiddle, Blues Shuffle, Bossa Nova
+  - ⭐ **Ritmos Famosos** — Billie Jean, We Will Rock You, Back in Black, Smells Like Teen Spirit, Stayin' Alive y más
 - **Control de Hi-Hat por puño** — Puño cerrado = Hi-Hat cerrado, mano abierta = Hi-Hat abierto
 - **Metrónomo integrado** — BPM ajustable (40–240), con acento en el primer tiempo
 - **Dos estilos visuales** — Clásico (textura de madera) y Neón (brillos azul/rosa)
@@ -20,12 +25,14 @@ Batería virtual controlada por gestos de las manos mediante seguimiento en tiem
 - **Efectos visuales** — Ondas expansivas y brillos al golpear
 - **HUD en tiempo real** — FPS, latencia, indicador de último golpe, barras de velocidad
 
-## 🚀 Demo
+## 🚀 Demo en Vivo
 
-1. Abre el proyecto en un navegador moderno
-2. Haz clic en **"Iniciar Cámara"**
-3. Permite el acceso a la cámara
-4. ¡Empieza a tocar moviendo tus dedos índice hacia abajo sobre los tambores!
+👉 **[Abrir Gesture Drums](https://csav20.github.io/gesture-drums/)** — Funciona directo desde el navegador, sin instalar nada.
+
+1. Haz clic en **"Iniciar Cámara"**
+2. Permite el acceso a la cámara
+3. ¡Empieza a tocar moviendo tus dedos índice hacia abajo sobre los tambores!
+4. Prueba el modo **🎶 Patrones** para aprender ritmos
 
 ## 📋 Requisitos
 

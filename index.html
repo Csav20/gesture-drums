@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gesture Drums — Batería con gestos</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
     <!-- Startup overlay -->
     <div id="startup-overlay">
@@ -70,12 +72,73 @@
                 <button id="btn-toggle-kit" class="hud-btn" title="Cambiar kit">🎨</button>
                 <button id="btn-metronome" class="hud-btn" title="Metrónomo">⏱️</button>
                 <button id="btn-settings" class="hud-btn" title="Sensibilidad">⚙️</button>
+                <button id="btn-patterns" class="hud-btn" title="Patrones">🎶</button>
             </div>
         </div>
 
         <!-- Hit velocity indicator -->
         <div id="velocity-bar-left" class="velocity-bar"></div>
         <div id="velocity-bar-right" class="velocity-bar right"></div>
+
+        <!-- Pattern Score Overlay -->
+        <div id="pattern-score" class="hidden">
+            <div id="score-result"></div>
+            <div id="score-streak"></div>
+        </div>
+
+        <!-- Pattern Countdown -->
+        <div id="pattern-countdown" class="hidden">
+            <span id="countdown-number"></span>
+        </div>
+
+        <!-- Pattern Progress Bar -->
+        <div id="pattern-progress" class="hidden">
+            <div id="progress-info">
+                <span id="progress-name"></span>
+                <span id="progress-score">0</span>
+            </div>
+            <div id="progress-bar-track">
+                <div id="progress-bar-fill"></div>
+            </div>
+            <button id="btn-stop-pattern" class="pattern-stop-btn">&times; Detener</button>
+        </div>
+
+        <!-- Patterns Library Panel -->
+        <div id="patterns-panel" class="hidden">
+            <div class="panel-header">
+                <span>🎶 Patrones de Aprendizaje</span>
+                <button id="btn-close-patterns" class="panel-close">&times;</button>
+            </div>
+            <div class="patterns-body">
+                <div class="patterns-levels" id="patterns-levels"></div>
+                <div class="patterns-list" id="patterns-list"></div>
+            </div>
+        </div>
+
+        <!-- Pattern Results Modal -->
+        <div id="pattern-results" class="hidden">
+            <div class="results-card">
+                <h2>🎯 Resultados</h2>
+                <div id="results-pattern-name"></div>
+                <div class="results-stats">
+                    <div class="stat"><span class="stat-value" id="res-accuracy">0%</span><span
+                            class="stat-label">Precisión</span></div>
+                    <div class="stat"><span class="stat-value" id="res-score">0</span><span
+                            class="stat-label">Puntaje</span></div>
+                    <div class="stat"><span class="stat-value" id="res-streak">0</span><span class="stat-label">Mejor
+                            Racha</span></div>
+                </div>
+                <div class="results-detail">
+                    <span class="perfect">✨ <span id="res-perfect">0</span> Perfecto</span>
+                    <span class="good">👍 <span id="res-good">0</span> Bien</span>
+                    <span class="missed">❌ <span id="res-missed">0</span> Fallado</span>
+                </div>
+                <div class="results-buttons">
+                    <button id="btn-retry-pattern" class="results-btn retry">🔄 Reintentar</button>
+                    <button id="btn-back-patterns" class="results-btn back">📋 Volver</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Sensitivity Settings Panel -->
         <div id="sensitivity-panel" class="hidden">
@@ -110,14 +173,17 @@
 
     <!-- MediaPipe CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
     <!-- App Scripts -->
+    <script src="js/drumPatterns.js"></script>
     <script src="js/audioEngine.js"></script>
     <script src="js/drumKit.js"></script>
     <script src="js/handTracker.js"></script>
     <script src="js/hitDetector.js"></script>
     <script src="js/app.js"></script>
 </body>
+
 </html>

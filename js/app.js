@@ -28,12 +28,32 @@
     var sensitivityPanel = document.getElementById('sensitivity-panel');
     var btnClosePanel = document.getElementById('btn-close-panel');
     var cameraOverlay = document.getElementById('camera-overlay');
+    var btnPatterns = document.getElementById('btn-patterns');
+    var patternsPanel = document.getElementById('patterns-panel');
+    var btnClosePatterns = document.getElementById('btn-close-patterns');
+    var patternsLevels = document.getElementById('patterns-levels');
+    var patternsList = document.getElementById('patterns-list');
+    var patternProgress = document.getElementById('pattern-progress');
+    var progressName = document.getElementById('progress-name');
+    var progressScore = document.getElementById('progress-score');
+    var progressBarFill = document.getElementById('progress-bar-fill');
+    var btnStopPattern = document.getElementById('btn-stop-pattern');
+    var patternScore = document.getElementById('pattern-score');
+    var scoreResult = document.getElementById('score-result');
+    var scoreStreak = document.getElementById('score-streak');
+    var patternCountdown = document.getElementById('pattern-countdown');
+    var countdownNumber = document.getElementById('countdown-number');
+    var patternResults = document.getElementById('pattern-results');
+    var btnRetryPattern = document.getElementById('btn-retry-pattern');
+    var btnBackPatterns = document.getElementById('btn-back-patterns');
 
     // ---- Core Systems ----
     var drumKit = null;
     var audioEngine = null;
     var handTracker = null;
     var hitDetector = null;
+    var drumPatternsEngine = null;
+    var currentPatternKey = null;
 
     // ---- State ----
     var isRunning = false;
@@ -118,6 +138,12 @@
         handTracker = new HandTracker(webcamVideo, handCanvas, onHandResults);
         await handTracker.init();
         await handTracker.start();
+
+        // Drum patterns engine
+        drumPatternsEngine = new DrumPatterns(audioEngine, drumKit);
+        drumPatternsEngine.onStepChange = onPatternStep;
+        drumPatternsEngine.onComplete = onPatternComplete;
+        drumPatternsEngine.onScore = onPatternScore;
 
         // Setup controls
         setupControls();
@@ -231,6 +257,11 @@
         // Visual ripple
         drumKit.triggerHit(hit.zone, hit.velocity);
 
+        // Register with pattern engine if active
+        if (drumPatternsEngine && drumPatternsEngine.active) {
+            drumPatternsEngine.registerHit(hit.zone.id);
+        }
+
         // Update HUD
         lastHitName = drumLabels[hit.zone.id] || hit.zone.id;
         lastHitEl.textContent = drumEmojis[hit.zone.id] || '🥁';
@@ -285,6 +316,11 @@
 
         // Render drum kit
         drumKit.render();
+
+        // Draw pattern highlights
+        if (drumPatternsEngine && drumPatternsEngine.active) {
+            drumPatternsEngine.drawHighlights(drumKit.ctx, drumKit.zones);
+        }
 
         // Draw zone highlight under drumstick tips
         drawStickHighlights();
@@ -400,6 +436,9 @@
                     break;
             }
         });
+
+        // Setup pattern controls
+        setupPatternControls();
     }
 
     // ---- Mouse/Touch Fallback ----
@@ -456,6 +495,165 @@
             };
             processHit(hit);
         }
+    }
+
+    // ---- Pattern System Callbacks ----
+
+    function onPatternStep(data) {
+        if (data.countdown) {
+            patternCountdown.classList.remove('hidden');
+            countdownNumber.textContent = data.beat;
+            // Re-trigger animation
+            countdownNumber.style.animation = 'none';
+            void countdownNumber.offsetWidth;
+            countdownNumber.style.animation = '';
+        } else {
+            patternCountdown.classList.add('hidden');
+            // Update progress bar
+            var pct = ((data.step + 1) / data.total) * 100;
+            progressBarFill.style.width = pct + '%';
+        }
+    }
+
+    function onPatternComplete(results) {
+        patternProgress.classList.add('hidden');
+        patternCountdown.classList.add('hidden');
+        patternScore.classList.add('hidden');
+
+        // Show results modal
+        document.getElementById('results-pattern-name').textContent =
+            drumPatternsEngine.currentPattern ? drumPatternsEngine.currentPattern.name : '';
+        document.getElementById('res-accuracy').textContent = results.accuracy + '%';
+        document.getElementById('res-score').textContent = results.score;
+        document.getElementById('res-streak').textContent = results.bestStreak;
+        document.getElementById('res-perfect').textContent = results.perfect;
+        document.getElementById('res-good').textContent = results.good;
+        document.getElementById('res-missed').textContent = results.missed;
+        patternResults.classList.remove('hidden');
+    }
+
+    var scoreHideTimeout = null;
+    function onPatternScore(data) {
+        // Show score popup
+        scoreResult.className = data.result;
+        var labels = { perfect: '✨ PERFECTO', good: '👍 BIEN', late: '⏰ TARDE' };
+        scoreResult.textContent = labels[data.result] || data.result;
+        scoreStreak.textContent = data.streak > 1 ? '🔥 x' + data.streak : '';
+        patternScore.classList.remove('hidden');
+
+        // Update progress score
+        progressScore.textContent = data.score;
+
+        if (scoreHideTimeout) clearTimeout(scoreHideTimeout);
+        scoreHideTimeout = setTimeout(function () {
+            patternScore.classList.add('hidden');
+        }, 500);
+    }
+
+    // ---- Patterns Panel ----
+
+    function buildPatternsPanel() {
+        var levels = DrumPatterns.getLevels();
+
+        // Build level tabs
+        patternsLevels.innerHTML = '';
+        levels.forEach(function (level, idx) {
+            var tab = document.createElement('button');
+            tab.className = 'level-tab' + (idx === 0 ? ' active' : '');
+            tab.textContent = level.emoji + ' ' + level.name;
+            tab.dataset.level = level.id;
+            tab.addEventListener('click', function () {
+                patternsLevels.querySelectorAll('.level-tab').forEach(function (t) {
+                    t.classList.remove('active');
+                });
+                tab.classList.add('active');
+                showPatternsByLevel(level.id);
+            });
+            patternsLevels.appendChild(tab);
+        });
+
+        // Show first level
+        showPatternsByLevel(levels[0].id);
+    }
+
+    function showPatternsByLevel(levelId) {
+        var patterns = DrumPatterns.getPatternsByLevel(levelId);
+        patternsList.innerHTML = '';
+
+        patterns.forEach(function (item) {
+            var card = document.createElement('div');
+            card.className = 'pattern-card';
+            card.innerHTML =
+                '<span class="pattern-emoji">' + item.pattern.emoji + '</span>' +
+                '<div class="pattern-info">' +
+                '<div class="pattern-name">' + item.pattern.name + '</div>' +
+                '<div class="pattern-desc">' + item.pattern.description + '</div>' +
+                '</div>' +
+                '<span class="pattern-bpm">' + item.pattern.bpm + ' BPM</span>';
+
+            card.addEventListener('click', function () {
+                startPattern(item.key);
+            });
+            patternsList.appendChild(card);
+        });
+    }
+
+    function startPattern(key) {
+        currentPatternKey = key;
+        var pattern = DrumPatterns.PATTERNS[key];
+        if (!pattern) return;
+
+        // Close panels
+        patternsPanel.classList.add('hidden');
+        patternResults.classList.add('hidden');
+        btnPatterns.classList.add('active');
+
+        // Show progress bar
+        progressName.textContent = pattern.emoji + ' ' + pattern.name;
+        progressScore.textContent = '0';
+        progressBarFill.style.width = '0%';
+        patternProgress.classList.remove('hidden');
+
+        // Start pattern
+        drumPatternsEngine.start(key);
+    }
+
+    // ---- Pattern Controls Setup ----
+    function setupPatternControls() {
+        btnPatterns.addEventListener('click', function () {
+            patternsPanel.classList.toggle('hidden');
+            sensitivityPanel.classList.add('hidden');
+            btnSettings.classList.remove('active');
+            btnPatterns.classList.toggle('active');
+            if (!patternsPanel.classList.contains('hidden')) {
+                buildPatternsPanel();
+            }
+        });
+
+        btnClosePatterns.addEventListener('click', function () {
+            patternsPanel.classList.add('hidden');
+            btnPatterns.classList.remove('active');
+        });
+
+        btnStopPattern.addEventListener('click', function () {
+            if (drumPatternsEngine) drumPatternsEngine.stop();
+            patternProgress.classList.add('hidden');
+            patternCountdown.classList.add('hidden');
+            patternScore.classList.add('hidden');
+            btnPatterns.classList.remove('active');
+        });
+
+        btnRetryPattern.addEventListener('click', function () {
+            patternResults.classList.add('hidden');
+            if (currentPatternKey) startPattern(currentPatternKey);
+        });
+
+        btnBackPatterns.addEventListener('click', function () {
+            patternResults.classList.add('hidden');
+            patternsPanel.classList.remove('hidden');
+            btnPatterns.classList.add('active');
+            buildPatternsPanel();
+        });
     }
 
 })();
