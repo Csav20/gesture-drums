@@ -500,6 +500,11 @@
     // ---- Pattern System Callbacks ----
 
     function onPatternStep(data) {
+        if (data.loop) {
+            // Loop restarted — update loop counter
+            progressScore.textContent = '🔄 x' + data.loopCount;
+            return;
+        }
         if (data.countdown) {
             patternCountdown.classList.remove('hidden');
             countdownNumber.textContent = data.beat;
@@ -519,6 +524,12 @@
         patternProgress.classList.add('hidden');
         patternCountdown.classList.add('hidden');
         patternScore.classList.add('hidden');
+
+        // Loop patterns don't show results — they were manually stopped
+        if (drumPatternsEngine && drumPatternsEngine.currentPattern && drumPatternsEngine.currentPattern.loop) {
+            btnPatterns.classList.remove('active');
+            return;
+        }
 
         // Show results modal
         document.getElementById('results-pattern-name').textContent =
@@ -610,7 +621,7 @@
 
         // Show progress bar
         progressName.textContent = pattern.emoji + ' ' + pattern.name;
-        progressScore.textContent = '0';
+        progressScore.textContent = pattern.loop ? '🔄 Ciclo' : '0';
         progressBarFill.style.width = '0%';
         patternProgress.classList.remove('hidden');
 

@@ -33,6 +33,91 @@ class DrumPatterns {
     // ---- Pattern Library ----
     static get PATTERNS() {
         return {
+            // ===== CLASE BÁSICA (loop continuo) =====
+            clase_crash_snare_kick: {
+                name: 'Crash → Snare → Kick',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 60,
+                loop: true,
+                description: 'Ciclo básico: golpea cada zona cuando se ilumine',
+                timeSignature: 4,
+                steps: [
+                    ['crash'], ['.'], ['snare'], ['.'],
+                    ['kick'], ['.'], ['crash'], ['.'],
+                    ['snare'], ['.'], ['kick'], ['.']
+                ]
+            },
+            clase_hihat_snare: {
+                name: 'Hi-Hat → Snare',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 70,
+                loop: true,
+                description: 'Alterna hi-hat y snare en ciclo continuo',
+                timeSignature: 4,
+                steps: [
+                    ['hihat_closed'], ['.'], ['snare'], ['.'],
+                    ['hihat_closed'], ['.'], ['snare'], ['.']
+                ]
+            },
+            clase_kick_hihat_snare: {
+                name: 'Kick → Hi-Hat → Snare',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 65,
+                loop: true,
+                description: 'Recorre los 3 elementos básicos',
+                timeSignature: 4,
+                steps: [
+                    ['kick'], ['.'], ['hihat_closed'], ['.'],
+                    ['snare'], ['.'], ['kick'], ['.'],
+                    ['hihat_closed'], ['.'], ['snare'], ['.']
+                ]
+            },
+            clase_toms_descend: {
+                name: 'Recorrido de Toms',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 70,
+                loop: true,
+                description: 'Tom High → Tom Mid → Floor Tom en ciclo',
+                timeSignature: 4,
+                steps: [
+                    ['tom_high'], ['.'], ['tom_mid'], ['.'],
+                    ['tom_low'], ['.'], ['tom_mid'], ['.']
+                ]
+            },
+            clase_full_kit: {
+                name: 'Recorrido Completo',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 55,
+                loop: true,
+                description: 'Conoce cada zona: kick, snare, hi-hat, toms, crash, ride',
+                timeSignature: 4,
+                steps: [
+                    ['kick'], ['.'], ['snare'], ['.'],
+                    ['hihat_closed'], ['.'], ['hihat_open'], ['.'],
+                    ['tom_high'], ['.'], ['tom_mid'], ['.'],
+                    ['tom_low'], ['.'], ['crash'], ['.'],
+                    ['ride'], ['.'], ['ride_bell'], ['.']
+                ]
+            },
+            clase_rock_loop: {
+                name: 'Rock Básico en Loop',
+                level: 'clase',
+                emoji: '🔄',
+                bpm: 75,
+                loop: true,
+                description: 'El ritmo de rock más simple, repite hasta dominar',
+                timeSignature: 4,
+                steps: [
+                    ['kick', 'hihat_closed'], ['.'], ['snare', 'hihat_closed'], ['.'],
+                    ['kick', 'hihat_closed'], ['.'], ['snare', 'hihat_closed'], ['.']
+                ]
+            },
+
             // ===== BÁSICO =====
             basic_hihat: {
                 name: 'Hi-Hat Básico',
@@ -286,6 +371,7 @@ class DrumPatterns {
 
     static getLevels() {
         return [
+            { id: 'clase', name: 'Clase Básica', emoji: '📖', description: 'Ciclos continuos para aprender cada zona' },
             { id: 'basico', name: 'Básico', emoji: '🟢', description: 'Ritmos simples para empezar' },
             { id: 'medio', name: 'Medio', emoji: '🟡', description: 'Combinaciones con más elementos' },
             { id: 'avanzado', name: 'Avanzado', emoji: '🔴', description: 'Patrones complejos y técnicos' },
@@ -308,6 +394,8 @@ class DrumPatterns {
         this.goodHits = 0;
         this.streak = 0;
         this.bestStreak = 0;
+        this.loopCount = 0;
+        this.isLooping = !!pattern.loop;
         this.active = true;
         this.isPlaying = true;
         this.activeHighlights = [];
@@ -320,6 +408,7 @@ class DrumPatterns {
     stop() {
         this.active = false;
         this.isPlaying = false;
+        this.isLooping = false;
         this.activeHighlights = [];
         this._pendingHits = [];
         if (this.stepTimeout) {
@@ -360,8 +449,17 @@ class DrumPatterns {
 
         // Pattern complete — loop or stop
         if (this.currentPattern && this.currentStep >= this.currentPattern.steps.length) {
-            this.stop();
-            return;
+            if (this.isLooping) {
+                // Loop: restart from step 0 without countdown
+                this.currentStep = 0;
+                this.loopCount++;
+                if (this.onStepChange) {
+                    this.onStepChange({ loop: true, loopCount: this.loopCount });
+                }
+            } else {
+                this.stop();
+                return;
+            }
         }
 
         // Countdown phase
