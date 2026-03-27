@@ -343,17 +343,17 @@ class DrumPatterns {
     // ---- Color map for drum zones ----
     static get ZONE_COLORS() {
         return {
-            kick:         '#e74c3c',  // Rojo
-            snare:        '#3498db',  // Azul
+            kick: '#e74c3c',  // Rojo
+            snare: '#3498db',  // Azul
             hihat_closed: '#2ecc71',  // Verde
-            hihat_open:   '#27ae60',  // Verde oscuro
-            tom_high:     '#e67e22',  // Naranja
-            tom_mid:      '#f39c12',  // Amarillo naranja
-            tom_low:      '#d35400',  // Naranja oscuro
-            crash:        '#9b59b6',  // Morado
-            ride:         '#1abc9c',  // Turquesa
-            ride_bell:    '#16a085',  // Turquesa oscuro
-            rim:          '#95a5a6'   // Gris
+            hihat_open: '#27ae60',  // Verde oscuro
+            tom_high: '#e67e22',  // Naranja
+            tom_mid: '#f39c12',  // Amarillo naranja
+            tom_low: '#d35400',  // Naranja oscuro
+            crash: '#9b59b6',  // Morado
+            ride: '#1abc9c',  // Turquesa
+            ride_bell: '#16a085',  // Turquesa oscuro
+            rim: '#95a5a6'   // Gris
         };
     }
 
@@ -403,6 +403,15 @@ class DrumPatterns {
         this._pendingHits = [];
         this._stepHitDrums = new Set();
         this._advance();
+    }
+
+    // ---- Adjust BPM live ----
+    setBpm(newBpm) {
+        this.bpm = Math.max(20, Math.min(200, newBpm));
+    }
+
+    getBpm() {
+        return this.bpm;
     }
 
     stop() {

@@ -611,6 +611,52 @@ body {
     transition: width 0.2s;
 }
 
+/* ---- BPM Speed Control ---- */
+
+#bpm-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 4px;
+}
+
+.bpm-btn {
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    background: rgba(100, 255, 218, 0.1);
+    color: #64ffda;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.bpm-btn:hover {
+    background: rgba(100, 255, 218, 0.25);
+    border-color: #64ffda;
+}
+
+.bpm-btn:active {
+    transform: scale(0.9);
+}
+
+#bpm-display {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #64ffda;
+    font-family: 'SF Mono', monospace;
+    min-width: 54px;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .pattern-stop-btn {
     padding: 4px 12px;
     border: 1px solid rgba(255, 255, 255, 0.15);

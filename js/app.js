@@ -46,6 +46,9 @@
     var patternResults = document.getElementById('pattern-results');
     var btnRetryPattern = document.getElementById('btn-retry-pattern');
     var btnBackPatterns = document.getElementById('btn-back-patterns');
+    var btnBpmDown = document.getElementById('btn-bpm-down');
+    var btnBpmUp = document.getElementById('btn-bpm-up');
+    var bpmDisplay = document.getElementById('bpm-display');
 
     // ---- Core Systems ----
     var drumKit = null;
@@ -609,6 +612,18 @@
         });
     }
 
+    function updateBpmDisplay() {
+        if (drumPatternsEngine) {
+            bpmDisplay.textContent = drumPatternsEngine.getBpm() + ' BPM';
+        }
+    }
+
+    function adjustBpm(delta) {
+        if (!drumPatternsEngine || !drumPatternsEngine.active) return;
+        drumPatternsEngine.setBpm(drumPatternsEngine.getBpm() + delta);
+        updateBpmDisplay();
+    }
+
     function startPattern(key) {
         currentPatternKey = key;
         var pattern = DrumPatterns.PATTERNS[key];
@@ -627,6 +642,7 @@
 
         // Start pattern
         drumPatternsEngine.start(key);
+        updateBpmDisplay();
     }
 
     // ---- Pattern Controls Setup ----
@@ -665,6 +681,10 @@
             btnPatterns.classList.add('active');
             buildPatternsPanel();
         });
+
+        // BPM speed controls
+        btnBpmDown.addEventListener('click', function () { adjustBpm(-5); });
+        btnBpmUp.addEventListener('click', function () { adjustBpm(5); });
     }
 
 })();
